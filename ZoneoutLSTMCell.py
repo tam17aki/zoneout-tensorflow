@@ -156,8 +156,8 @@ class ZoneoutLSTMCell(RNNCell):
                 w_o_diag = tf.get_variable(
                     "W_O_diag", shape=[self.num_units], dtype=dtype)
 
-            # make binary mask tensor for cell
             with tf.name_scope(None, "zoneout"):
+                # make binary mask tensor for cell
                 keep_prob_cell = tf.convert_to_tensor(
                     self.zoneout_factor_cell,
                     dtype=c_prev.dtype
