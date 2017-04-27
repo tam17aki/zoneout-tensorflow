@@ -1,2 +1,2 @@
 # zoneout-tensorflow
-Zoneout regularizer by Tensorflow
+An implementation of zoneout regularizer on LSTM-RNN by Tensorflow   
