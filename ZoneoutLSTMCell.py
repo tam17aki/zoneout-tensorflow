@@ -54,8 +54,8 @@ class ZoneoutLSTMCell(RNNCell):
                  forget_bias=1.0,
                  state_is_tuple=True,
                  activation=tf.tanh,
-                 zoneout_factor_cell=0.5,
-                 zoneout_factor_output=0.05,
+                 zoneout_factor_cell=0.0,
+                 zoneout_factor_output=0.0,
                  reuse=None):
         """Initialize the parameters for an LSTM cell.
         Args:
@@ -81,6 +81,14 @@ class ZoneoutLSTMCell(RNNCell):
         if input_size is not None:
             tf.logging.warn(
                 "%s: The input_size parameter is deprecated.", self)
+
+        if not (zoneout_factor_cell >= 0.0 and zoneout_factor_cell <= 1.0):
+            raise ValueError(
+                "Parameter zoneout_factor_cell must be between 0 and 1")
+
+        if not (zoneout_factor_output >= 0.0 and zoneout_factor_output <= 1.0):
+            raise ValueError(
+                "Parameter zoneout_factor_cell must be between 0 and 1")
 
         self.num_units = num_units
         self.is_training = is_training
@@ -184,7 +192,7 @@ class ZoneoutLSTMCell(RNNCell):
                                w_f_diag * c_prev) + \
                     tf.sigmoid(i + w_i_diag * c_prev) * \
                     self.activation(j)
-                if self.is_training and self.zoneout_factor_cell < 1.0:
+                if self.is_training and self.zoneout_factor_cell > 0.0:
                     c = binary_mask_cell * c_prev + \
                         binary_mask_cell_complement * c_temp
                 else:
@@ -192,7 +200,7 @@ class ZoneoutLSTMCell(RNNCell):
             else:
                 c_temp = c_prev * tf.sigmoid(f + self.forget_bias) + \
                     tf.sigmoid(i) * self.activation(j)
-                if self.is_training and self.zoneout_factor_cell < 1.0:
+                if self.is_training and self.zoneout_factor_cell > 0.0:
                     c = binary_mask_cell * c_prev + \
                         binary_mask_cell_complement * c_temp
                 else:
@@ -204,14 +212,14 @@ class ZoneoutLSTMCell(RNNCell):
             # apply zoneout for output
             if self.use_peepholes:
                 h_temp = tf.sigmoid(o + w_o_diag * c) * self.activation(c)
-                if self.is_training and self.zoneout_factor_output < 1:
+                if self.is_training and self.zoneout_factor_output > 0.0:
                     h = binary_mask_output * h_prev + \
                         binary_mask_output_complement * h_temp
                 else:
                     h = h_temp
             else:
                 h_temp = tf.sigmoid(o) * self.activation(c)
-                if self.is_training and self.zoneout_factor_output < 1:
+                if self.is_training and self.zoneout_factor_output > 0.0:
                     h = binary_mask_output * h_prev + \
                         binary_mask_output_complement * h_temp
                 else:
