@@ -84,11 +84,11 @@ class ZoneoutLSTMCell(RNNCell):
 
         if not (zoneout_factor_cell >= 0.0 and zoneout_factor_cell <= 1.0):
             raise ValueError(
-                "Parameter zoneout_factor_cell must be between 0 and 1")
+                "Parameter zoneout_factor_cell must be in [0 1]")
 
         if not (zoneout_factor_output >= 0.0 and zoneout_factor_output <= 1.0):
             raise ValueError(
-                "Parameter zoneout_factor_cell must be between 0 and 1")
+                "Parameter zoneout_factor_cell must be in [0 1]")
 
         self.num_units = num_units
         self.is_training = is_training
